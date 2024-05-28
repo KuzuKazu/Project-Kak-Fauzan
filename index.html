@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etalase Toko Yggdrasil</title>
+<meta name="google-signin-client_id" content="163201943645-u4d93ugblrqbuj58jogeek1egndibfjv.apps.googleusercontent.com">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+<style>
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+header, footer {
+    padding: 1em 0;
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    width: 100%;
+}
+
+/* Product Styles */
+#store {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+.product {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    flex: 1 0 200px;
+    max-width: 200px;
+}
+.product img {
+    border-radius: 5px;
+    margin-bottom: 10px;
+    max-width: 100%;
+    height: auto;
+}
+.product button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.product button:hover {
+    background-color: #0056b3;
+}
+
+/* Sidebar Styles */
+#sidebar {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    width: 300px;
+    position: fixed;
+    top: 0;
+    left: -300px;
+    height: 100%;
+    transition: left 0.3s ease;
+}
+#sidebar.active {
+    left: 0;
+}
+#cart {
+    margin-top: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+#cart h2 {
+    color: #333;
+}
+#cart .product {
+    border: none;
+    background-color: #f4f4f4;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    flex-direction: row;
+    align-items: center;
+    color: #333;
+}
+#cart .product img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+    border-radius: 5px;
+}
+#cart .product button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+#cart .product button:hover {
+    background-color: #a30e1f;
+}
+</style>
+</head>
+<body>
+
+<div id="g_id_onload"
+data-client_id="163201943645-u4d93ugblrqbuj58jogeek1egndibfjv.apps.googleusercontent.com"
+data-callback="handleCredentialResponse"
+data-auto_prompt="false">
+</div>
+<div class="g_id_signin"
+data-type="standard"
+data-size="large"
+data-theme="outline"
+data-text="sign_in_with"
+data-shape="rectangular"
+data-logo_alignment="left">
+</div>
+
+<header>
+<h1>Selamat Datang di Etalase Toko Yggdrasil</h1>
+</header>
+
+<div class="container">
+<button class="toggle-btn" id="toggleBtn">☰</button>
+
+<div id="store">
+<p id="loading">Memuat produk...</p>
+</div>
+
+<div id="sidebar">
+<div id="cart">
+<h2>Keranjang Belanja</h2>
+<div id="cart-items"></div>
+</div>
+</div>
+</div>
+
+<footer>
+<p>&copy; 2024 Etalase Toko Yggdrasil. </p>
+</footer>
+
+<script>
+let cart = []; // Inisialisasi keranjang belanja
+
+const products = [ 
+    { id: 1, name: 'Baju', price: 100, image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf' }, 
+    { id: 2, name: 'Celana', price: 150, image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cGFudHN8ZW58MHx8MHx8fDA%3D' }, 
+    { id: 3, name: 'Sepatu', price: 200, image: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77' } 
+];
+
+function handleCredentialResponse(response) {
+        const responsePayload = jwt_decode(response.credential); 
+        const namaPengguna = responsePayload.name;
+        const emailPengguna = responsePayload.email;
+        const fotoPengguna = responsePayload.picture;
+    }
+
+function fetchProducts() {
+    const storeDiv = document.getElementById('store');
+    const loadingElement = document.getElementById('loading');
+    loadingElement.style.display = 'block'; 
+
+    setTimeout(() => {
+        storeDiv.innerHTML = '';
+        products.forEach(product => {
+            const productDiv = document.createElement('div');
+            productDiv.classList.add('product');
+            productDiv.innerHTML = `
+                <img src="${product.image}" alt="${product.name}" style="width: 100px; height: 100px;">
+                <p>${product.name}</p>
+                <p>${product.price} $</p>
+                <button onclick="addToCart(${product.id})">Tambahkan ke Keranjang</button>
+            `;
+            storeDiv.appendChild(productDiv);
+        });
+        loadingElement.style.display = 'none'; 
+    }, 1000);
+}
+
+function addToCart(productId) {
+    const product = products.find(p => p.id === productId);
+    if (product) {
+        cart.push(product);
+        updateCartUI();
+    }
+}
+
+function removeFromCart(productId) {
+    cart = cart.filter(p => p.id !== productId);
+    updateCartUI();
+}
+
+function updateCartUI() {
+    const cartItemsDiv = document.getElementById('cart-items');
+    cartItemsDiv.innerHTML = '';
+
+    if (cart.length === 0) {
+        cartItemsDiv.innerHTML = '<p>Keranjang Anda kosong.</p>';
+        return; 
+    }
+
+    cart.forEach(product => {
+        const productDiv = document.createElement('div');
+        productDiv.classList.add('product');
+        productDiv.innerHTML = `
+            <img src="${product.image}" alt="${product.name}">
+            <p>${product.name}</p>
+            <p>${product.price} $</p>
+            <button onclick="removeFromCart(${product.id})">Hapus</button>
+        `;
+        cartItemsDiv.appendChild(productDiv);
+    });
+}
+
+const toggleBtn = document.getElementById('toggleBtn');
+const sidebar = document.getElementById('sidebar');
+
+toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+});
+
+window.onload = fetchProducts; 
+
+function login() 
+{
+  var myParams = {
+    'clientid' : '163201943645-u4d93ugblrqbuj58jogeek1egndibfjv.apps.googleusercontent.com',
+    'cookiepolicy' : 'single_host_origin',
+    'callback' : 'loginCallback',
+    'approvalprompt':'force',
+    'scope' : 'https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/plus.profile.emails.read'
+  };
+  gapi.auth.signIn(myParams);
+}
+
+function loginCallback(result)
+{
+    if(result['status']['signed_in'])
+    {
+        var request = gapi.client.plus.people.get(
+        {
+            'userId': 'me'
+        });
+        request.execute(function (resp)
+        {
+            /* console.log(resp);
+            console.log(resp['id']); */
+            var email = '';
+            if(resp['emails'])
+            {
+                for(i = 0; i < resp['emails'].length; i++)
+                {
+                    if(resp['emails'][i]['type'] == 'account')
+                    {
+                        email = resp['emails'][i]['value'];//here is required email id
+                    }
+                }
+            }
+           var usersname = resp['displayName'];//required name
+        });
+    }
+}
+function onLoadCallback()
+{
+    gapi.client.setApiKey('AIzaSyDu4RsH36pjiWH5TIJUDgR6LKWvq6MVekg'); // Ganti dengan API Key Anda di sini
+    gapi.client.load('plus', 'v1',function(){console.log('loaded')});
+}
+
+</script>
+
+</body>
+</html>
